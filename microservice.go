@@ -12,6 +12,7 @@ func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/api/echo", echo)
 	http.HandleFunc("/api/books", api.BooksHandleFunc) // Responds to http://localhost:8080/api/books
+	http.HandleFunc("/api/books/", api.BookHandleFunc) // Retreive individual books, update, and delete them
 
 	http.ListenAndServe(port(), nil)
 }
