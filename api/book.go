@@ -63,7 +63,7 @@ func BooksHandleFunc(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusConflict) // Return HTTP 409
 		}
 	default:
-		w.WriteHeader(http.StatusBadRequest) // Return invalid status code
+		w.WriteHeader(http.StatusBadRequest) // Return invalid status code HTTP 400
 		w.Write([]byte("Unsupported request type."))
 
 	} // Write back
@@ -81,6 +81,28 @@ func BookHandleFunc(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusNotFound) // Return HTTP 404
 		}
+	case http.MethodPut:
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		book := FromJSON(body) // Unmarshal body to book structure
+		found := UpdateBook(isbn, book)
+		if found {
+			w.WriteHeader(http.StatusOK) // Return HTTP 200
+		} else {
+			w.WriteHeader(http.StatusNotFound) // Return HTTP 404
+		}
+	case http.MethodDelete:
+		found := DeleteBook(isbn)
+		if found {
+			w.WriteHeader(http.StatusOK) // Return HTTP 200
+		} else {
+			w.WriteHeader(http.StatusNotFound) // Return HTTP 404
+		}
+	default:
+		w.WriteHeader(http.StatusBadRequest) // Return HTTP 400
+		w.Write([]byte("Unsupported request method."))
 	}
 }
 
@@ -117,9 +139,26 @@ func CreateBook(b Book) (string, bool) {
 
 // GetBook returns a book if it exists
 func GetBook(isbn string) ([]Book, bool) {
-	// Check if ISBN exists in map
 	if _, exists := Books[isbn]; exists {
 		return []Book{Books[isbn]}, true
 	}
-	return make([]Book, 0), false
+	return nil, false
+}
+
+// UpdateBook updates a book if it exists
+func UpdateBook(isbn string, b Book) bool {
+	if _, exists := Books[isbn]; exists {
+		Books[isbn] = b
+		return true
+	}
+	return false
+}
+
+// DeleteBook deletes a book if it exists
+func DeleteBook(isbn string) bool {
+	if _, exists := Books[isbn]; exists {
+		delete(Books, isbn)
+		return true
+	}
+	return false
 }
