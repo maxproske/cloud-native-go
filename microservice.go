@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/maxproske/cloud-native-go/api"
 )
 
 func main() {
-	// HandleFunc responds to root homepage
 	http.HandleFunc("/", index)
 	http.HandleFunc("/api/echo", echo)
+	http.HandleFunc("/api/books", api.BooksHandleFunc) // Responds to http://localhost:8080/api/books
+
 	http.ListenAndServe(port(), nil)
 }
 
@@ -27,8 +30,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, world!")
 }
 
-// ResponseWriter responds content to client
-// Request respond to HTTP request receieved
+// ResponseWriter responds content to client. Request respond to HTTP request receieved
 func echo(w http.ResponseWriter, r *http.Request) {
 	message := r.URL.Query()["message"][0] // Extract first message parameter
 	fmt.Fprintf(w, message)
