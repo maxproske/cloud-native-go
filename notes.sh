@@ -95,3 +95,19 @@ kubectl apply -f k8s-service.yml # Update
 kubectl describe service cloud-native-go # Describe
 kubectl delete services cloud-native-go # Delete services
 kubectl delete deployments cloud-native-go # Delete deployments
+
+# Horizontal scaling
+kubectl get pods -w # In a seperate window
+kubectl create -f k8s-deployment.yml --record=true # Record history
+kubectl scale deployment cloud-native-go --replicas=5 # Scale up
+kubectl get pods
+kubectl scale deployment cloud-native-go --replicas=3 # Scale down
+kubectl get pods
+kubectl rollout history deployment cloud-native-go # See history
+
+# Update image as rolling update
+# kubectl set image deployment (deployment) (container)=(image)
+kubectl set image deployment cloud-native-go cloud-native-go=maxproske/cloud-native-go:1.0.2-alpine
+
+# Undo rollout
+kubectl rollout undo deployment cloud-native-go
