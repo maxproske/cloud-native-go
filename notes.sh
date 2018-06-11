@@ -22,7 +22,7 @@ docker stats
 # Process Status
 docker stop $(docker ps -q)		# Stop all containers gracefully
 docker kill $(docker ps -q)		# Stop all containers immediately
-docker rm $(docker ps -a -q)	# Remove all containers
+docker rm $(docker ps -a -q) -f	# Remove all containers
 docker rmi $(docker images -q)	# Remove all docker images
 
 # Pull
@@ -36,7 +36,7 @@ docker push maxproske/cloud-native-go:1.0.1-alpine
 
 # Compose up
 docker-compose build
-docker-compose.exe up -d
+docker-compose up -d
 docker ps # One for nginx, one for microservice
 
 # Compose kill all
@@ -50,6 +50,27 @@ https://github.com/kubernetes/minikube/releases
 #   If you accidentally use VirtualBox, delete C:\Users\Max\.minikube and start minikube again
 #   If minikube exits with status 1, your machine doesn't have enough memory to run the VM.
 #     Set: HyperV Manager > minikube > Settings > Memory > uncheck 'Enable Dynamic Memory'
-minikube delete
-minikube start --vm-driver="hyperv" --hyperv-virtual-switch="myswitch"
+minikube start --vm-driver="hyperv" --hyperv-virtual-switch="Primary Virtual Switch"
 minikube status
+kubectl cluster-info # Check we are working locally
+
+# Run the provided command to work with the docker daemon
+minikube docker-env
+docker ps
+
+# Create pod
+kubectl create -f k8s-pod.yml
+kubectl get pods    # List
+kubectl describe pod cloud-native-go    # Describe
+kubectl delete pod cloud-native-go  # Delete
+
+# Access service
+kubectl port-forward cloud-native-go 8080:8080 # View at http://localhost:8080/api/books
+
+# Two pods running in different namespaces
+kubectl get ns # Get namespace
+kubectl get pods --namespace kube-system # Pods running in this namespace
+kubectl create -f k8s-namespace.yml # Create own namespace
+kubectl create -f k8s-pod.yml --namespace cloud-native-go # Recreate with namespace
+kubectl get pods --namespace cloud-native-go # Second pod created
+kubectl delete pod cloud-native-go # Delete first pod
