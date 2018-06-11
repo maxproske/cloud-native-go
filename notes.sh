@@ -42,3 +42,14 @@ docker ps # One for nginx, one for microservice
 # Compose kill all
 docker-compose kill
 docker-compose rm
+
+# Install Kubernetes
+https://github.com/kubernetes/minikube/releases
+
+# Start Kubernetes using Hyper-V
+#   If you accidentally use VirtualBox, delete C:\Users\Max\.minikube and start minikube again
+#   If minikube exits with status 1, your machine doesn't have enough memory to run the VM.
+#     Set: HyperV Manager > minikube > Settings > Memory > uncheck 'Enable Dynamic Memory'
+minikube delete
+minikube start --vm-driver="hyperv" --hyperv-virtual-switch="myswitch"
+minikube status
