@@ -61,16 +61,37 @@ docker ps
 # Create pod
 kubectl create -f k8s-pod.yml
 kubectl get pods    # List
+kubectl get pods -o wide # Detailed list
 kubectl describe pod cloud-native-go    # Describe
 kubectl delete pod cloud-native-go  # Delete
 
 # Access service
 kubectl port-forward cloud-native-go 8080:8080 # View at http://localhost:8080/api/books
 
-# Two pods running in different namespaces
+# Create namespace
 kubectl get ns # Get namespace
 kubectl get pods --namespace kube-system # Pods running in this namespace
 kubectl create -f k8s-namespace.yml # Create own namespace
 kubectl create -f k8s-pod.yml --namespace cloud-native-go # Recreate with namespace
 kubectl get pods --namespace cloud-native-go # Second pod created
 kubectl delete pod cloud-native-go # Delete first pod
+kubectl delete --all pods --namespace=cloud-native-go # Delete second pod
+
+# Create deployment
+kubectl create -f k8s-deployment.yml
+kubectl get deployments,pods,rs
+kubectl apply -f k8s-deployment.yml # Update
+kubectl describe deployment cloud-native-go # View constraints
+
+# Create service
+kubectl create -f k8s-service.yml
+
+# Access pods running behind load balancing service.
+# (eg http://192.168.0.29:32270/)
+minikube ip
+kubectl get services 
+
+kubectl apply -f k8s-service.yml # Update
+kubectl describe service cloud-native-go # Describe
+kubectl delete services cloud-native-go # Delete services
+kubectl delete deployments cloud-native-go # Delete deployments
